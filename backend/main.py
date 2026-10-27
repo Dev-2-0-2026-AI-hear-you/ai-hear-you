@@ -7,9 +7,15 @@ app = Flask(__name__)
 def home():
     return jsonify({
         "message": "Welcome to AI Hear You!",
-        "status": "running successfully"
+        "status": "running"
     })
 
+@app.get("/health")
+def health():
+    return jsonify({
+        "status": "healthy"
+
+    })
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
