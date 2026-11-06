@@ -8,8 +8,9 @@ pip install flask_sqlalchemy
 pip install SQLAlchemy
 py app.py
 
-This command runs the app on your localhost on port 5000
+This last command runs the app on your localhost on port 5000
 
+Web address (type in your browser)
 http://localhost:5000
 
 two pages: home and hackathon
