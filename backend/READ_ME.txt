@@ -1,5 +1,11 @@
-Please set up a python virtual environment, then download Flask and SQLAlchemy into the environment.
-
+Windows instructions:
+#Open terminal in your downloaded folder and type the following commands one-by-one:
+py -m venv venv
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+venv\Scripts\Activate.ps1
+pip install Flask
+pip install flask_sqlalchemy
+pip install SQLAlchemy
 py app.py
 
 This command runs the app on your localhost on port 5000
