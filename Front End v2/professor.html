@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Live Transcript - Instructor</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="professor.css">
+</head>
+<body>
+
+  <!-- TEST ONLY: clicking the top bar adds a sample question. Remove role/tabindex/title/id once the server feeds questions in. -->
+  <header class="top-bar" id="test-bar" role="button" tabindex="0" title="Test: add a question"></header>
+
+  <main class="layout">
+
+    <!-- Left: transcript -->
+    <section class="transcript" id="transcript" tabindex="0" aria-label="Transcript">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc quis libero id sapien venenatis commodo. Vestibulum fermentum, libero ut facilisis facilisis, dui risus aliquet mauris, nec elementum urna nibh sed quam. Praesent et dui efficitur tortor viverra faucibus. Etiam vel condimentum sapien. Aliquam erat volutpat. Sed velit turpis, sodales ut posuere eu, sollicitudin id risus. Nunc hendrerit, est et ultricies rhoncus, magna sapien dignissim nunc, ac dictum risus sem ac tellus.</p>
+
+      <p>Duis at ipsum vitae velit consectetur pulvinar et eu turpis. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed aliquam sed sapien vitae ullamcorper. Praesent sed velit viverra, egestas quam a, finibus nulla. Nulla eget gravida turpis, non sodales nibh. Morbi dignissim urna in lacus facilisis fermentum. Nullam enim leo, consectetur quis efficitur quis, ultricies eget justo.</p>
+
+      <p>Cras ante metus, sagittis vitae ipsum at, pulvinar elementum felis. Aliquam erat volutpat. Nam vitae commodo nulla, a tempor ligula. Phasellus gravida ante massa, id commodo turpis lobortis pharetra. Nullam nec nunc sodales, interdum augue a, sollicitudin orci. Integer lobortis semper mi. Nullam consectetur iaculis risus a imperdiet. In molestie lacus et massa efficitur, quis eleifend tortor fringilla. Vivamus vehicula, tortor non ultrices ultricies, felis tortor euismod dolor, vitae bibendum mauris tortor id ligula. Aenean suscipit purus tortor, non elementum sapien rutrum vel. Aliquam ut erat placerat, volutpat purus eu, facilisis mauris.</p>
+    </section>
+
+    <!-- Right: student questions (main focus) -->
+    <aside class="questions" id="questions" aria-label="Student questions">
+      <div class="questions-inner">
+        <ul class="question-list" id="question-list"></ul>
+      </div>
+    </aside>
+
+  </main>
+
+  <script src="professor.js"></script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+/* Instructor view: loads after styles.css and overrides only what differs. */
+
+:root {
+  /* The questions panel is the main focus here, so it gets most of the width. */
+  --sidebar-width: 60vw;
+}
+
+/* TEST ONLY: the top bar doubles as an "add test question" button */
+#test-bar { cursor: pointer; }
+#test-bar:focus-visible { outline: 3px solid #fff; outline-offset: -5px; }
+
+.questions-inner {
+  justify-content: flex-start; /* list reads top-down; newest at the bottom */
+  padding: 6px 14px 10px 8px;
+}
+
+.question-list { gap: 8px; }
+
+/* ---------- One question ---------- */
+.p-question {
+  display: grid;
+  grid-template-columns: var(--icon-size) minmax(0, 1fr);
+  grid-template-areas:
+    ".    time"
+    "icon bubble";
+  column-gap: 4px;
+  align-items: start;
+}
+
+.p-time {
+  grid-area: time;
+  padding-left: 14px;
+  font-size: 12px;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.p-question .q-icon { grid-area: icon; }
+
+.p-bubble {
+  grid-area: bubble;
+  justify-self: start;       /* collapsed: shrink to the text */
+  max-width: 100%;
+  margin: 0;
+  padding: 10px 16px;
+  background: #fff;
+  border: 2px solid var(--ink);
+  border-radius: 24px;
+  overflow-wrap: anywhere;
+}
+
+/* Collapsed: grey placeholder, clickable to open */
+.p-question:not(.open) .p-bubble {
+  color: #6b6b6b;
+  cursor: pointer;
+}
+
+/* Open: full width, real question text */
+.p-question.open .p-bubble {
+  justify-self: stretch;
+  color: var(--ink);
+  padding: 12px 16px;
+}
+
+.p-bubble:focus-visible {
+  outline: 3px solid var(--header-bg);
+  outline-offset: 2px;
+}

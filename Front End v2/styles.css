@@ -1,0 +1,208 @@
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+/* ---------- Design tokens ---------- */
+:root {
+  --header-bg: #0097a7;
+  --header-height: 40px;
+  --panel-bg: #ffffff;
+  --side-bg: #eeeeee;
+  --ink: #000000;
+  --scroll-track: #d9d9d9;
+  --scroll-thumb: #333333;
+  --sidebar-width: 340px;
+  --icon-size: 56px;
+  --font: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, Helvetica, Arial, sans-serif;
+}
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font);
+  font-size: 17px;
+  line-height: 1.35;
+  color: var(--ink);
+  background: var(--panel-bg);
+  overflow: hidden; /* only the two panes scroll */
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- Header ---------- */
+.top-bar {
+  flex: 0 0 var(--header-height);
+  background: var(--header-bg);
+}
+
+/* ---------- Two-pane layout ---------- */
+.layout {
+  flex: 1 1 auto;
+  min-height: 0; /* lets children scroll inside a flex parent */
+  display: grid;
+  grid-template-columns: 1fr var(--sidebar-width);
+}
+
+/* ---------- Scrollbars (shared) ---------- */
+.transcript,
+.questions {
+  overflow-y: auto;
+  scrollbar-color: var(--scroll-thumb) var(--scroll-track); /* Firefox */
+  scrollbar-width: auto;
+}
+
+.transcript::-webkit-scrollbar,
+.questions::-webkit-scrollbar {
+  width: 14px;
+}
+
+.transcript::-webkit-scrollbar-track,
+.questions::-webkit-scrollbar-track {
+  background: var(--scroll-track);
+}
+
+.transcript::-webkit-scrollbar-thumb,
+.questions::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 7px;
+  border: 2px solid var(--scroll-track);
+}
+
+/* ---------- Transcript (left) ---------- */
+.transcript {
+  background: var(--panel-bg);
+  padding: 0 14px 0 20px;
+}
+
+.transcript p {
+  margin: 0 0 1.35em;
+}
+
+.transcript p:first-child { margin-top: 0.35em; }
+.transcript p:last-child  { margin-bottom: 0.5em; }
+
+/* ---------- Questions (right) ---------- */
+.questions {
+  background: var(--side-bg);
+  border-left: 2px solid #c8c8c8;
+}
+
+/* Fills the pane and pushes content to the bottom,
+   so the ask box sits at the bottom edge until the list overflows. */
+.questions-inner {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 8px 4px 4px 4px;
+}
+
+.question-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.question {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.bubble {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 8px 14px;
+  background: #fff;
+  border: 2px solid var(--ink);
+  border-radius: 22px;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Hand icon button / badge ---------- */
+.q-icon {
+  flex: 0 0 var(--icon-size);
+  width: var(--icon-size);
+  height: var(--icon-size);
+  padding: 0;
+  display: block;
+  overflow: hidden;
+  background: #fff;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+span.q-icon { cursor: default; }
+
+.q-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+button.q-icon:hover,
+button.q-icon:focus-visible {
+  background: #ddd;
+}
+
+button.q-icon:focus-visible,
+.ask-form textarea:focus-visible,
+.transcript:focus-visible {
+  outline: 3px solid var(--header-bg);
+  outline-offset: 2px;
+}
+
+/* ---------- Ask form ---------- */
+.ask-form {
+  display: flex;
+  align-items: flex-end; /* icon stays at the bottom as the draft grows */
+  gap: 4px;
+  margin-top: 14px;
+}
+
+/* Empty = pill. Typed text wraps and the field grows into a question bubble. */
+.ask-form textarea {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: block;
+  min-height: 44px;
+  max-height: 50vh;
+  margin: 0;
+  padding: 8px 14px;
+  font: inherit;
+  line-height: 1.35;
+  color: var(--ink);
+  background: #fff;
+  border: 2px solid var(--ink);
+  border-radius: 22px;
+  resize: none;
+  field-sizing: content; /* auto-grow (Chromium); other browsers handled in JS later */
+}
+
+.ask-form textarea::placeholder {
+  color: #6b6b6b;
+}
+
+/* ---------- Narrow screens ---------- */
+@media (max-width: 700px) {
+  :root { --sidebar-width: 220px; --icon-size: 48px; }
+  body { font-size: 16px; }
+}

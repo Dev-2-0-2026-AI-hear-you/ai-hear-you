@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Live Transcript</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="top-bar" role="banner"></header>
+
+  <main class="layout">
+
+    <!-- Left: transcript -->
+    <section class="transcript" id="transcript" tabindex="0" aria-label="Transcript">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc quis libero id sapien venenatis commodo. Vestibulum fermentum, libero ut facilisis facilisis, dui risus aliquet mauris, nec elementum urna nibh sed quam. Praesent et dui efficitur tortor viverra faucibus. Etiam vel condimentum sapien. Aliquam erat volutpat. Sed velit turpis, sodales ut posuere eu, sollicitudin id risus. Nunc hendrerit, est et ultricies rhoncus, magna sapien dignissim nunc, ac dictum risus sem ac tellus.</p>
+
+      <p>Duis at ipsum vitae velit consectetur pulvinar et eu turpis. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed aliquam sed sapien vitae ullamcorper. Praesent sed velit viverra, egestas quam a, finibus nulla. Nulla eget gravida turpis, non sodales nibh. Morbi dignissim urna in lacus facilisis fermentum. Nullam enim leo, consectetur quis efficitur quis, ultricies eget justo.</p>
+
+      <p>Cras ante metus, sagittis vitae ipsum at, pulvinar elementum felis. Aliquam erat volutpat. Nam vitae commodo nulla, a tempor ligula. Phasellus gravida ante massa, id commodo turpis lobortis pharetra. Nullam nec nunc sodales, interdum augue a, sollicitudin orci. Integer lobortis semper mi. Nullam consectetur iaculis risus a imperdiet. In molestie lacus et massa efficitur, quis eleifend tortor fringilla. Vivamus vehicula, tortor non ultrices ultricies, felis tortor euismod dolor, vitae bibendum mauris tortor id ligula. Aenean suscipit purus tortor, non elementum sapien rutrum vel. Aliquam ut erat placerat, volutpat purus eu, facilisis mauris.</p>
+    </section>
+
+    <!-- Right: questions -->
+    <aside class="questions" id="questions" aria-label="Questions">
+      <div class="questions-inner">
+
+        <ul class="question-list" id="question-list">
+          <li class="question posted">
+            <p class="bubble">Sed feugiat et quam quis cursus. Aenean sed dapibus lorem.</p>
+            <span class="q-icon">
+              <img src="Hand_Raised_Inverted.jpg" alt="Question you posted">
+            </span>
+          </li>
+
+          <li class="question posted">
+            <p class="bubble">This is another question that you have asked already, it has an inverted icon to show that it has been posted. I am now filling the space to be able to show off the scroll bar.</p>
+            <span class="q-icon">
+              <img src="Hand_Raised_Inverted.jpg" alt="Question you posted">
+            </span>
+          </li>
+
+        </ul>
+
+        <form class="ask-form" id="ask-form" autocomplete="off">
+          <label for="question-input" class="visually-hidden">Ask a question</label>
+          <textarea id="question-input" name="question" rows="1" placeholder="Ask a question?"></textarea>
+          <button class="q-icon" type="submit">
+            <img src="Hand_Raised.jpg" alt="Submit question">
+          </button>
+        </form>
+
+      </div>
+    </aside>
+
+  </main>
+
+  <script src="student.js"></script>
+</body>
+</html>
