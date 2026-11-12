@@ -1,7 +1,9 @@
 from flask import Flask, jsonify
+from questions import questions_bp
 
 app = Flask(__name__)
 
+app.register_blueprint(questions_bp)
 
 @app.get("/")
 def home():
