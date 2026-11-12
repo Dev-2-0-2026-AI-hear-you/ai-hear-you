@@ -3,10 +3,10 @@
 
   const pane = document.getElementById('questions');
   const list = document.getElementById('question-list');
-  const testBar = document.getElementById('test-bar');
+  //const testBar = document.getElementById('test-bar');
 
-  const ICON_CLOSED = 'Hand_Raised.jpg';
-  const ICON_OPEN = 'Hand_Raised_Inverted.jpg';
+  const ICON_CLOSED = '/static/Hand_Raised.jpg';
+  const ICON_OPEN = '/static/Hand_Raised_Inverted.jpg';
   const PLACEHOLDER = 'A student has a question';
 
   /* ---------- Helpers ---------- */
@@ -88,19 +88,56 @@
 
   window.addQuestion = addQuestion;
 
-  /* ---------- TEST ONLY: top bar adds a predetermined question ---------- */
+  /* ---------- Retrieve questions from Flask ---------- */
 
-  var testQuestion = 'Hi, this is the question I asked. You chose to see the question by clicking on it, indicated by the icon change. I LOOOOOVE asking questions';
+  // Keep track of questions already displayed
+  const seenQuestionIds = new Set();
 
-  function addTestQuestion() {
-    addQuestion(testQuestion);
+  async function loadQuestions() {
+    try {
+        const response = await fetch('/questions');
+
+        if (!response.ok) {
+            throw new Error('Could not retrieve questions');
+        }
+
+        const questions = await response.json();
+
+        questions.forEach((question) => {
+            // Only display questions we haven't seen before
+            if (!seenQuestionIds.has(question.id)) {
+                seenQuestionIds.add(question.id);
+
+                const date = new Date(question.created_at);
+
+                addQuestion(question.question, date);
+            }
+        });
+
+    } catch (error) {
+        console.error('Error loading questions:', error);
+    }
   }
 
-  testBar.addEventListener('click', addTestQuestion);
-  testBar.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      addTestQuestion();
-    }
-  });
+// Load existing questions immediately
+loadQuestions();
+
+// Check for new questions every 2 seconds
+setInterval(loadQuestions, 2000);
+
+  // /* ---------- TEST ONLY: top bar adds a predetermined question ---------- */
+
+  // var testQuestion = 'Hi, this is the question I asked. You chose to see the question by clicking on it, indicated by the icon change. I LOOOOOVE asking questions';
+
+  // function addTestQuestion() {
+  //   addQuestion(testQuestion);
+  // }
+
+  // testBar.addEventListener('click', addTestQuestion);
+  // testBar.addEventListener('keydown', (event) => {
+  //   if (event.key === 'Enter' || event.key === ' ') {
+  //     event.preventDefault();
+  //     addTestQuestion();
+  //   }
+  // });
 })();
