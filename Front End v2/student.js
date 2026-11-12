@@ -6,7 +6,7 @@
   const list = document.getElementById('question-list');
   const pane = document.getElementById('questions');
 
-  const POSTED_ICON = 'Hand_Raised_Inverted.jpg';
+  const POSTED_ICON = '/static/Hand_Raised_Inverted.jpg';
 
   /**
    * Hook for the back-end team: send the question to the server here.
@@ -14,8 +14,22 @@
    * For now it resolves immediately so the front end can be tested on its own.
    */
   async function sendQuestionToServer(text) {
-    // e.g. await fetch('/api/questions', { method: 'POST', body: JSON.stringify({ text }) });
-    return { text };
+    // e.g. await fetch('/api/questions', { method: 'POST', body: JSON.stringify({ text }) });  
+    const response = await fetch('/questions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+          question: text        
+      })
+    });
+
+    if (!response.ok) {
+       throw new Error('Failed to submit question');
+    }
+
+    return await response.json();
   }
 
   /** Build a posted-question list item (text is inserted as text, never as HTML). */
