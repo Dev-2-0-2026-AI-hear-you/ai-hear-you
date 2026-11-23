@@ -2,6 +2,7 @@ import numpy as np
 import sounddevice as sd
 import queue
 import threading
+import database.transcript_db as t_db
 
 from scipy.signal import resample_poly
 from math import gcd
@@ -56,17 +57,6 @@ def transcribe_audio(audio_bytes, sample_rate=SAMPLE_RATE, language="en", initia
         )
 
     # Transcribe
-    '''
-    segments, info = model.transcribe(
-        audio,
-        language=language,
-        beam_size=3,
-        best_of=1,
-        temperature=0,
-        vad_filter=False,
-        condition_on_previous_text=False
-    )
-    '''
     segments, info = model.transcribe(
         audio,
         language=language,
@@ -103,7 +93,19 @@ def _transcription_worker(audio_queue, sample_rate, on_transcription):
             audio_bytes = audio.astype("<f4", copy=False).tobytes()
             result = transcribe_audio(audio_bytes, sample_rate)
 
+            # Send transcribed text back to caller
             if result:
+                # Store transcribed text in database
+                db = t_db.get_db()
+                try:
+                    db.execute(
+                        "INSERT INTO transcript (body) VALUES (?)",
+                        (result)
+                    )
+                    db.commit()
+                except db.IntegrityError:
+                    pass
+
                 on_transcription(result)
 
         except Exception as error:
