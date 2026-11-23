@@ -93,138 +93,60 @@
         const captionButton = document.getElementById("transcription-toggle");
         const captionStatus = document.getElementById("transcription-status");
         const transcript = document.getElementById("transcript");
-        const chunkSeconds = 5;
-        const targetSampleRate = 16000;
-        let microphone;
-        let audioContext;
-        let processor;
-        let silence;
-        let isRecording = false;
-        let bufferedAudio = [];
-        let bufferedSamples = 0;
-        let sendQueue = Promise.resolve();
-        let summaryTimer;
 
-        async function updateSummary() {
-            const text = transcript.textContent.trim();
-            if (!text) return;
-            const response = await fetch("/summarize", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ transcript: text })
-            });
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.error || "Summary unavailable.");
-            document.getElementById("summary").textContent = result.summary;
-        }
+        let previousTranscript = "";
 
-        function joinAudio(chunks, size) {
-            const result = new Float32Array(size);
-            let offset = 0;
-            for (const chunk of chunks) {
-                result.set(chunk, offset);
-                offset += chunk.length;
-            }
-            return result;
-        }
-
-        function queueAudio(audio, sampleRate) {
-            sendQueue = sendQueue.then(async () => {
-                const response = await fetch(`/transcribe?sample_rate=${sampleRate}`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/octet-stream" },
-                    body: audio.buffer
-                });
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.error || "Transcription failed.");
-                if (result.text) {
-                    transcript.textContent += (transcript.textContent ? "\n" : "") + result.text;
-                    transcript.scrollTop = transcript.scrollHeight;
-                    clearTimeout(summaryTimer);
-                    summaryTimer = setTimeout(() => updateSummary().catch((error) => {
-                        document.getElementById("summary").textContent = error.message;
-                    }), 500);
-                }
-            }).catch((error) => {
-                captionStatus.textContent = error.message || "Could not reach the transcription service.";
-            });
-        }
-
-        async function startCaptions() {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                throw new Error("Microphone access is not available in this browser.");
-            }
-            microphone = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: true } });
-            audioContext = new AudioContext({ sampleRate: targetSampleRate });
-            const source = audioContext.createMediaStreamSource(microphone);
-            processor = audioContext.createScriptProcessor(4096, 1, 1);
-            silence = audioContext.createGain();
-            silence.gain.value = 0;
-            bufferedAudio = [];
-            bufferedSamples = 0;
-            sendQueue = Promise.resolve();
-            isRecording = true;
-
-            processor.onaudioprocess = (event) => {
-                if (!isRecording) return;
-                const input = event.inputBuffer.getChannelData(0);
-                bufferedAudio.push(new Float32Array(input));
-                bufferedSamples += input.length;
-                const chunkSize = Math.round(audioContext.sampleRate * chunkSeconds);
-                while (bufferedSamples >= chunkSize) {
-                    const combined = joinAudio(bufferedAudio, bufferedSamples);
-                    queueAudio(combined.slice(0, chunkSize), audioContext.sampleRate);
-                    const leftover = combined.slice(chunkSize);
-                    bufferedAudio = leftover.length ? [leftover] : [];
-                    bufferedSamples = leftover.length;
-                }
-            };
-
-            source.connect(processor);
-            processor.connect(silence);
-            silence.connect(audioContext.destination);
-            await audioContext.resume();
-            captionButton.textContent = "Stop live captions";
-            captionButton.setAttribute("aria-pressed", "true");
-            captionStatus.textContent = "";
-        }
-
-        async function stopCaptions() {
-            isRecording = false;
-            captionButton.disabled = true;
-            if (processor) processor.disconnect();
-            if (silence) silence.disconnect();
-            if (microphone) microphone.getTracks().forEach((track) => track.stop());
-            if (bufferedSamples) queueAudio(joinAudio(bufferedAudio, bufferedSamples), audioContext.sampleRate);
+        async function loadTranscript() {
             try {
-                await sendQueue;
-                if (audioContext) await audioContext.close();
-                captionStatus.textContent = "Captions are off.";
+                const response = await fetch("/transcript");
+                const result = await response.json();
+
+                if (!response.ok) throw new Error("Could not load transcript.");
+
+                const newText = result.lines.join("\n");
+
+                if (newText !== previousTranscript) {
+                    transcript.textContent = newText;
+                    transcript.scrollTop = transcript.scrollHeight;
+                    previousTranscript = newText;
+                }
+
             } catch (error) {
-                captionStatus.textContent = error.message || "Could not finish the last audio chunk.";
+                captionStatus.textContent = error.message;
             }
-            captionButton.textContent = "Start live captions";
-            captionButton.setAttribute("aria-pressed", "false");
-            captionButton.disabled = false;
         }
 
         captionButton.addEventListener("click", async () => {
-            if (isRecording) {
-                await stopCaptions();
-                return;
-            }
+            const currentlyRecording = captionButton.getAttribute("aria-pressed") === "true";
+
             captionButton.disabled = true;
-            captionStatus.textContent = "Connecting to the microphone…";
+            captionStatus.textContent = currentlyRecording ? "Stopping captions..." : "Connecting to the microphone...";
+
             try {
-                await startCaptions();
+                const response = await fetch(
+                    currentlyRecording ? "/stop-captions" : "/start-captions",
+                    { method: "POST" }
+                );
+
+                const result = await response.json();
+
+                if (!response.ok) throw new Error(result.error || "Transcription failed.");
+
+                const recording = !currentlyRecording;
+
+                captionButton.setAttribute("aria-pressed", String(recording));
+                captionButton.textContent = recording ? "Stop live captions" : "Start live captions";
+                captionStatus.textContent = recording ? "Listening..." : "Captions are off.";
+
             } catch (error) {
-                if (microphone) microphone.getTracks().forEach((track) => track.stop());
-                captionStatus.textContent = error.message || "Could not start live captions.";
-                captionButton.setAttribute("aria-pressed", "false");
+                captionStatus.textContent = error.message;
             } finally {
                 captionButton.disabled = false;
             }
         });
+
+        loadTranscript();
+        setInterval(loadTranscript, 1000);
 
         const handButton = document.getElementById("hand-toggle");
         const handStatus = document.getElementById("hand-status");

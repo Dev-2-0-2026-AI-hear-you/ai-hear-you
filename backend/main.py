@@ -1,7 +1,8 @@
 from flask import Flask, jsonify, render_template, request
 
 from questions import questions_bp
-from transcription import transcribe_audio
+import transcription
+import threading
 
 app = Flask(__name__)
 app.register_blueprint(questions_bp)
@@ -35,46 +36,42 @@ def hand_raise_status():
     return jsonify({"raised": hand_raised})
 
 
-@app.post("/transcribe")
-def transcribe():
-    if not request.data:
-        return jsonify({"error": "An audio chunk is required."}), 400
+# Transcription Stuff
+transcript_lines = []
+transcript_lock = threading.Lock()
 
+def save_transcription(text):
+    with transcript_lock:
+        transcript_lines.append(text)
+
+@app.route("/start-captions", methods=["POST"])
+def start_captions():
     try:
-        text = transcribe_audio(request.data, request.args.get("sample_rate", 16000, type=int))
-    except ModuleNotFoundError:
-        return jsonify({"error": "Live transcription packages are missing. Install the backend requirements and restart the server."}), 503
-    except Exception:
-        return jsonify({"error": "The audio chunk could not be transcribed."}), 500
+        with transcript_lock:
+            transcript_lines.clear()
 
-    return jsonify({"text": text})
+        transcription.start(on_transcription=save_transcription)
 
+        return jsonify({"status": "started"})
 
-@app.post("/summarize")
-def summarize():
-    data = request.get_json(silent=True)
-    transcript = data.get("transcript") if isinstance(data, dict) else None
-    if not isinstance(transcript, str) or not transcript.strip():
-        return jsonify({"error": "Transcript text is required."}), 400
-
-    try:
-        import ollama
-        response = ollama.chat(
-            model="gemma3:1b",
-            messages=[
-                {"role": "system", "content": "Summarize lecture notes clearly for a student. Use a few short bullet points. Only include information from the transcript."},
-                {"role": "user", "content": transcript[-12000:]}
-            ],
-        )
-    except ModuleNotFoundError:
-        return jsonify({"error": "Install the Ollama Python package and start Ollama to use summaries."}), 503
     except Exception as error:
-        if error.__class__.__name__ == "ResponseError" and getattr(error, "status_code", None) == 404:
-            return jsonify({"error": "The gemma3:1b model is missing. Run ollama pull gemma3:1b."}), 503
-        return jsonify({"error": "Could not connect to Ollama. Start the Ollama app, then restart this backend."}), 503
+        return jsonify({"error": str(error)}), 500
 
-    return jsonify({"summary": response.message.content})
 
+@app.route("/stop-captions", methods=["POST"])
+def stop_captions():
+    try:
+        transcription.stop()
+        return jsonify({"status": "stopped"})
+
+    except Exception as error:
+        return jsonify({"error": str(error)}), 500
+
+
+@app.route("/transcript", methods=["GET"])
+def get_transcript():
+    with transcript_lock:
+        return jsonify({"lines": transcript_lines.copy()})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
