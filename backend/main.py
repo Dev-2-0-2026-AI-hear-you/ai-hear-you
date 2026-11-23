@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, render_template, request
 
 from questions import questions_bp
-from backend.transcription import transcribe_audio
+from transcription import transcribe_audio
 
 app = Flask(__name__)
 app.register_blueprint(questions_bp)
