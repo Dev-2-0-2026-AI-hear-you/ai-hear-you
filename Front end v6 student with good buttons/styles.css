@@ -1,11 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+ 
 /* ---------- Design tokens ---------- */
 :root {
   --header-bg: #0097a7;
   --header-height: 40px;
   --panel-bg: #ffffff;
   --side-bg: #eeeeee;
+  --page-bg: #d9d9d9;
+  --panel-border: #555555;
   --ink: #000000;
   --scroll-track: #d9d9d9;
   --scroll-thumb: #333333;
@@ -13,15 +16,15 @@
   --icon-size: 56px;
   --font: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, Helvetica, Arial, sans-serif;
 }
-
+ 
 /* ---------- Base ---------- */
 *, *::before, *::after { box-sizing: border-box; }
-
+ 
 html, body {
   height: 100%;
   margin: 0;
 }
-
+ 
 body {
   display: flex;
   flex-direction: column;
@@ -32,7 +35,7 @@ body {
   background: var(--panel-bg);
   overflow: hidden; /* only the two panes scroll */
 }
-
+ 
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -41,21 +44,110 @@ body {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
-
+ 
 /* ---------- Header ---------- */
-.top-bar {
-  flex: 0 0 var(--header-height);
-  background: var(--header-bg);
+/* Same two columns as the layout below, so each title sits over its pane. */
+/* Brand bar: site name on the left, Log In link on the right. */
+.brand-bar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 16px;
+  background: #d3d3d3;
 }
 
+.brand-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  color: #3a7ca5;
+}
+
+.login-link {
+  font-size: 16px;
+  color: #3a7ca5;
+  text-decoration: underline;
+}
+
+.login-link:hover,
+.login-link:focus-visible {
+  color: #0097a7;
+}
+
+.top-bar {
+  flex: 0 0 var(--header-height);
+  display: grid;
+  grid-template-columns: 1fr var(--sidebar-width);
+  align-items: center;
+  background: var(--header-bg);
+  color: #fff;
+}
+
+.top-cell {
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.top-cell + .top-cell {
+  border-left: 2px solid rgba(0, 0, 0, 0.25);
+}
+
+.top-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Start / Stop toggle */
+.toggle-btn {
+  min-width: 96px;
+  padding: 2px 18px;
+  font: inherit;
+  font-size: 20px;
+  line-height: 1.3;
+  color: #fff;
+  background: #00707d;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.toggle-btn:hover,
+.toggle-btn:focus-visible {
+  background: #005a65;
+}
+
+.toggle-btn:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+.toggle-btn[aria-pressed="true"] {
+  background: #981d17; /* Stop state */
+}
+
+.toggle-btn[aria-pressed="true"]:hover,
+.toggle-btn[aria-pressed="true"]:focus-visible {
+  background: #7e1813;
+}
+ 
 /* ---------- Two-pane layout ---------- */
 .layout {
   flex: 1 1 auto;
   min-height: 0; /* lets children scroll inside a flex parent */
   display: grid;
   grid-template-columns: 1fr var(--sidebar-width);
+  background: var(--page-bg); /* shows as the margin around the transcript panel */
 }
-
+ 
 /* ---------- Scrollbars (shared) ---------- */
 .transcript,
 .questions {
@@ -63,43 +155,49 @@ body {
   scrollbar-color: var(--scroll-thumb) var(--scroll-track); /* Firefox */
   scrollbar-width: auto;
 }
-
+ 
 .transcript::-webkit-scrollbar,
 .questions::-webkit-scrollbar {
   width: 14px;
 }
-
+ 
 .transcript::-webkit-scrollbar-track,
 .questions::-webkit-scrollbar-track {
   background: var(--scroll-track);
 }
-
+ 
 .transcript::-webkit-scrollbar-thumb,
 .questions::-webkit-scrollbar-thumb {
   background: var(--scroll-thumb);
   border-radius: 7px;
   border: 2px solid var(--scroll-track);
 }
-
+ 
 /* ---------- Transcript (left) ---------- */
+/* A panel hanging from the top bar: square top, rounded bottom corners,
+   with grey padding on the left, right and bottom. */
 .transcript {
   background: var(--panel-bg);
-  padding: 0 14px 0 20px;
+  margin: 0 18px 18px 18px;
+  padding: 8px 14px 8px 20px;
+  border: 2px solid var(--panel-border);
+  border-top: 0;
+  border-radius: 0 0 28px 28px;
 }
-
+ 
 .transcript p {
   margin: 0 0 1.35em;
 }
-
+ 
 .transcript p:first-child { margin-top: 0.35em; }
 .transcript p:last-child  { margin-bottom: 0.5em; }
-
+ 
 /* ---------- Questions (right) ---------- */
 .questions {
   background: var(--side-bg);
   border-left: 2px solid #c8c8c8;
 }
-
+ 
 /* Fills the pane and pushes content to the bottom,
    so the ask box sits at the bottom edge until the list overflows. */
 .questions-inner {
@@ -109,7 +207,7 @@ body {
   justify-content: flex-end;
   padding: 8px 4px 4px 4px;
 }
-
+ 
 .question-list {
   list-style: none;
   margin: 0;
@@ -118,13 +216,13 @@ body {
   flex-direction: column;
   gap: 14px;
 }
-
+ 
 .question {
   display: flex;
   align-items: flex-end;
   gap: 4px;
 }
-
+ 
 .bubble {
   flex: 1 1 auto;
   min-width: 0;
@@ -135,7 +233,7 @@ body {
   border-radius: 22px;
   overflow-wrap: anywhere;
 }
-
+ 
 /* ---------- Hand icon button / badge ---------- */
 .q-icon {
   flex: 0 0 var(--icon-size);
@@ -149,27 +247,27 @@ body {
   border-radius: 50%;
   cursor: pointer;
 }
-
+ 
 span.q-icon { cursor: default; }
-
+ 
 .q-icon img {
   display: block;
   width: 100%;
   height: 100%;
 }
-
+ 
 button.q-icon:hover,
 button.q-icon:focus-visible {
   background: #ddd;
 }
-
+ 
 button.q-icon:focus-visible,
 .ask-form textarea:focus-visible,
 .transcript:focus-visible {
   outline: 3px solid var(--header-bg);
   outline-offset: 2px;
 }
-
+ 
 /* ---------- Ask form ---------- */
 .ask-form {
   display: flex;
@@ -177,7 +275,7 @@ button.q-icon:focus-visible,
   gap: 4px;
   margin-top: 14px;
 }
-
+ 
 /* Empty = pill. Typed text wraps and the field grows into a question bubble. */
 .ask-form textarea {
   flex: 1 1 auto;
@@ -196,13 +294,20 @@ button.q-icon:focus-visible,
   resize: none;
   field-sizing: content; /* auto-grow (Chromium); other browsers handled in JS later */
 }
-
+ 
 .ask-form textarea::placeholder {
   color: #6b6b6b;
 }
-
+ 
 /* ---------- Narrow screens ---------- */
 @media (max-width: 700px) {
   :root { --sidebar-width: 220px; --icon-size: 48px; }
   body { font-size: 16px; }
+  .top-title { font-size: 22px; }
+  .brand-title { font-size: 22px; }
+  .login-link { font-size: 14px; }
+  .top-cell { gap: 12px; }
+  .toggle-btn { font-size: 16px; min-width: 72px; padding: 2px 12px; }
+  .transcript { margin: 0 10px 10px 10px; }
 }
+ 

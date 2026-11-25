@@ -1,0 +1,1 @@
+The new front end. Start/stop toggle button currently adds questions to show functionality, please replace interior of the two functions beginListening() and stopListening() with the needed functionality. login link goes directly to https://esalter.ca/auth/login
